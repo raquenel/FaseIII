@@ -6,11 +6,19 @@ package calculoimc;
  */
 public class Imc {
     
+    /**
+     Calcula o IMC;
+     */
+    
     public double calcular(double peso, double altura){
         
         return peso / (altura * altura);
         
     }
+    
+    /**
+     Retorna a situação do IMC;
+     */
     
     public String situation (double imc){
         
