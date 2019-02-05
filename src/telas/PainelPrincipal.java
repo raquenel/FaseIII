@@ -152,6 +152,10 @@ public class PainelPrincipal extends javax.swing.JPanel {
         
         String strPeso = cpPeso.getText();
         String strAltura = cpAltura.getText();
+        
+        strPeso = strPeso.replaceAll(",", ".");
+        strAltura = strAltura.replaceAll(",", ".");
+        
         double peso = Double.parseDouble(strPeso);
         double altura = Double.parseDouble(strAltura);
         
@@ -160,9 +164,6 @@ public class PainelPrincipal extends javax.swing.JPanel {
         String situacao = im.situation(vlrImc);
         
         String formatado = df.format(vlrImc);
-        
-        strPeso = strPeso.replaceAll(",", ".");
-        strAltura = strAltura.replaceAll(",", ".");
         
         labelVlrImc.setText(""+formatado);
         labelSituacaoImc.setText(""+situacao);
