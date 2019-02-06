@@ -1,10 +1,23 @@
 package calculoimc;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Abdel
  */
 public class Imc {
+    
+    private String nome = "";
+    
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getNome() {
+        return nome;
+    }
     
     /**
      Calcula o IMC;

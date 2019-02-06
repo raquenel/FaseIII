@@ -6,7 +6,14 @@
 package telas;
 
 import calculoimc.Imc;
+import gravardados.GerenciaDeDados;
+import gravardados.ManipulacaoDeArquivo;
+import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,8 +26,10 @@ public class PainelPrincipal extends javax.swing.JPanel {
      */
     public PainelPrincipal() {
         initComponents();
+        
         labelVlrImc.setText("");
         labelSituacaoImc.setText("");
+        
     }
 
     /**
@@ -42,6 +51,7 @@ public class PainelPrincipal extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         labelVlrImc = new javax.swing.JLabel();
         labelSituacaoImc = new javax.swing.JLabel();
+        btnGravar = new javax.swing.JButton();
 
         jLabel1.setFont(new java.awt.Font("Arial Black", 0, 36)); // NOI18N
         jLabel1.setText("Peso:");
@@ -58,6 +68,7 @@ public class PainelPrincipal extends javax.swing.JPanel {
 
         cpAltura.setFont(new java.awt.Font("Arial Black", 0, 24)); // NOI18N
 
+        btnImc.setFont(new java.awt.Font("Arial Black", 0, 18)); // NOI18N
         btnImc.setText("Calcular IMC");
         btnImc.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -77,17 +88,22 @@ public class PainelPrincipal extends javax.swing.JPanel {
         labelSituacaoImc.setFont(new java.awt.Font("Arial Black", 0, 24)); // NOI18N
         labelSituacaoImc.setText("valor");
 
+        btnGravar.setFont(new java.awt.Font("Arial Black", 0, 18)); // NOI18N
+        btnGravar.setText("Gravar IMC");
+        btnGravar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGravarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btnImc, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(22, 22, 22)
@@ -112,7 +128,12 @@ public class PainelPrincipal extends javax.swing.JPanel {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(labelSituacaoImc)
                                     .addComponent(labelVlrImc))))
-                        .addGap(0, 20, Short.MAX_VALUE)))
+                        .addGap(0, 20, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(btnGravar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnImc, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -138,7 +159,9 @@ public class PainelPrincipal extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(labelSituacaoImc))
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(btnGravar)
+                .addContainerGap(20, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -170,8 +193,48 @@ public class PainelPrincipal extends javax.swing.JPanel {
         
     }//GEN-LAST:event_btnImcActionPerformed
 
+    private void btnGravarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGravarActionPerformed
+
+        DecimalFormat df = new DecimalFormat("#,##");
+        
+        String strPeso = cpPeso.getText();
+        String strAltura = cpAltura.getText();
+        
+        strPeso = strPeso.replaceAll(",", ".");
+        strAltura = strAltura.replaceAll(",", ".");
+        
+        double peso = Double.parseDouble(strPeso);
+        double altura = Double.parseDouble(strAltura);
+        
+        Imc im = new Imc();
+        double vlrImc = im.calcular(peso, altura);
+        String situacao = im.situation(vlrImc);
+        
+        String formatado = df.format(vlrImc);
+        
+        ManipulacaoDeArquivo m = new ManipulacaoDeArquivo("C:/Users/Suporte/Documents/NetBeansProjects/dados_de_imc", "cadastro_de_imc.txt");
+        
+        Imc imc = new Imc();
+        
+        String nome;
+        nome = JOptionPane.showInputDialog("Informe seu nome: ");
+        
+        String dados = "\n"+"Nome: "+nome+"\n Peso: "+strPeso+"\n Altura: "+strAltura+
+                "\n Valor do IMC: "+formatado+"\n Situação: "+situacao+"\n";
+        
+        GerenciaDeDados.criarPastas();
+        
+        try {
+            m.gravar(dados);
+        } catch (IOException ex) {
+            Logger.getLogger(PainelPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_btnGravarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnGravar;
     private javax.swing.JButton btnImc;
     private javax.swing.JTextField cpAltura;
     private javax.swing.JTextField cpPeso;
